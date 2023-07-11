@@ -10,7 +10,7 @@ function parseDiff(diff) {
 	const chunks = diff.split("++");
 	return chunks.map((chunk) => {
 		const datum = chunk.split("||");
-		const text = datum[0].replace(/\n/g, "NEWLINE");
+		const text = datum[0].replace(/\n/g, " NEWLINE ");
 		// const text = datum[0].replace(/\n/g, "<span class='newline'></span>");
 		// const text = datum[0];
 		const cat = cleanCat(datum[1]);

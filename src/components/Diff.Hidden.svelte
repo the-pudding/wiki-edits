@@ -15,7 +15,7 @@
 				// 	"<span class='newline'></span>",
 				// 	"[newline]"
 				// );
-				const split = text.split(/([\s.,;:!?]+)/).map((word) => word);
+				const split = text.split(/([\s.,;:!?()]+)/).map((word) => word);
 				return split;
 			})
 			.flat()
@@ -57,7 +57,6 @@
 				const cur = positionsNew.find((d) => d.id === prev.id);
 				const action = cur ? "update" : "exit";
 
-				if (prev.id === "is-0") console.log(cur.x, prev.x);
 				// TODO target position for exit?
 				if (cur) cur.action = action;
 
