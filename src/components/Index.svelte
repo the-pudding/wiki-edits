@@ -1,32 +1,39 @@
 <script>
 	import { browser } from "$app/environment";
-	import { getContext } from "svelte";
+	import { onMount, getContext } from "svelte";
+	import viewport from "$stores/viewport.js";
+	import { scrollIndex } from "$stores/misc.js";
 	import WIP from "$components/helpers/WIP.svelte";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import Figure from "$components/figure/Figure.svelte";
-	import Diff from "$components/Diff.svelte";
+	import DiffHidden from "$components/Diff.Hidden.svelte";
+	import DiffCanvas from "$components/Diff.Canvas.svelte";
 	import loadDiffData from "$data/loadDiffData.js";
 
 	// const copy = getContext("copy");
 	// const data = getContext("data");
+	let height;
 	let data = [];
-	let scrollIndex;
 
 	async function load() {
 		data = await loadDiffData();
 	}
 
-	$: if (browser) load();
-	$: diff = data[scrollIndex || 0]?.diff;
+	$: diff = data[$scrollIndex || 0]?.diff;
+
+	onMount(() => {
+		height = `${$viewport.height}px`;
+		load();
+	});
 </script>
 
 <!-- <WIP /> -->
 
 {#if data.length}
 	<section id="steps">
-		<Scrolly bind:value={scrollIndex}>
+		<Scrolly bind:value={$scrollIndex}>
 			{#each data as { dateFormatted, diffs, revid }, i}
-				{@const active = scrollIndex === i}
+				{@const active = $scrollIndex === i}
 				<div data-revid={revid} class:active>
 					<p>
 						{dateFormatted}
@@ -41,8 +48,9 @@
 		</Scrolly>
 	</section>
 
-	<section id="graphic">
-		<Diff {diff} />
+	<section id="graphic" style:height>
+		<DiffHidden {diff} />
+		<DiffCanvas />
 	</section>
 {/if}
 
@@ -58,9 +66,10 @@
 	}
 
 	[data-revid] {
-		height: 20vh;
+		height: 50vh;
 		display: flex;
 		align-items: center;
+		justify-content: flex-end;
 	}
 
 	p {
@@ -72,5 +81,13 @@
 
 	.active {
 		font-weight: bold;
+	}
+
+	#graphic {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		padding: 16px 32px;
 	}
 </style>

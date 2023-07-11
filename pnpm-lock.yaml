@@ -23,6 +23,9 @@ devDependencies:
   d3:
     specifier: ^7.8.5
     version: 7.8.5
+  gsap:
+    specifier: ^3.12.2
+    version: 3.12.2
   layercake:
     specifier: ^7.6.0
     version: 7.6.0(svelte@4.0.5)(typescript@5.1.6)
@@ -1011,6 +1014,10 @@ packages:
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+    dev: true
+
+  /gsap@3.12.2:
+    resolution: {integrity: sha512-EkYnpG8qHgYBFAwsgsGEqvT1WUidX0tt/ijepx7z8EUJHElykg91RvW1XbkT59T0gZzzszOpjQv7SE41XuIXyQ==}
     dev: true
 
   /has-flag@4.0.0:

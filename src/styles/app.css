@@ -96,3 +96,11 @@ span.newline {
 	visibility: hidden;
 	height: 8px;
 }
+
+[data-edit].added {
+	background: lightgreen;
+}
+
+[data-edit].removed {
+	background: pink;
+}
