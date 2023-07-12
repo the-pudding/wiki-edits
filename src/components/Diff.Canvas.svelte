@@ -14,9 +14,9 @@
 	let animating = false;
 	let steps;
 
-	function getFill({ action, a }) {
-		if (action === "enter") return `rgba(50, 200, 50, ${a})`;
-		if (action === "exit") return `rgba(200, 50, 50, ${a})`;
+	function getFill({ state, a }) {
+		if (state === "add") return `rgba(50, 200, 50, ${a})`;
+		if (state === "remove") return `rgba(200, 50, 50, ${a})`;
 		return `rgba(0, 0, 0, ${a})`;
 	}
 	function render() {
@@ -28,15 +28,37 @@
 		// console.log("render");
 		tweens.forEach((t) => {
 			const items = get(t);
-			items.forEach(({ id, x, y, a, action, text }) => {
+			items.forEach((item) => {
+				const { id, x, y, a, state, text, strike } = item;
 				const match = $positions.find((p) => p.id === id);
 				match.x = x;
 				match.y = y;
 				const left = x * dpr;
 				const top = y * dpr + (16 - 1) * dpr;
 
-				ctx.fillStyle = getFill({ action, a });
+				// ctx.strokeStyle = "#fff"; // Set your stroke color
+				// ctx.lineWidth = 2; // Set your line width for the stroke
+				// ctx.strokeText(text, left, top);
+
+				ctx.fillStyle = getFill({ state, a });
 				ctx.fillText(text, left, top);
+
+				// draw a strikethrough if removeing
+				if (item.state === "remove") {
+					if (!item.textW) item.textW = ctx.measureText(text).width;
+					const strikeProgress = Math.min(1, strike * 4);
+					const strikeW = strikeProgress * item.textW;
+
+					ctx.strokeStyle = getFill({ state, a });
+					ctx.lineWidth = 2;
+					ctx.beginPath();
+					ctx.moveTo(left, top - 4 * dpr);
+
+					// if (strikeProgress === 1) item.strikeDone = true;
+					ctx.lineTo(left + strikeW, top - 4 * dpr);
+					ctx.stroke();
+				}
+				const w = ctx.measureText(text).width;
 			});
 		});
 
@@ -51,7 +73,7 @@
 		height = dpr * canvasHeight;
 	}
 
-	function stepEnd(action) {
+	function stepEnd(state) {
 		steps.unshift();
 		if (steps.length === 0) animating = false;
 	}
@@ -60,30 +82,32 @@
 		if (!ctx) return;
 
 		animating = false;
-		steps = ["exit", "update", "enter"];
+		steps = ["remove", "unchange", "add"];
 
-		tweens = steps.map((action, i) => {
-			const filtered = $positions.filter((d) => d.action === action);
+		tweens = steps.map((state, i) => {
+			const filtered = $positions.filter((d) => d.state === state);
 			const start = filtered.map((d) => ({
 				...d,
 				x: d.x,
-				y: d.y + (d.action === "enter" ? 17 * dpr : 0),
-				a: d.action === "enter" ? 0 : 1
+				y: d.y,
+				a: d.state === "add" ? 0 : d.state === "remove" ? 2 : 1,
+				strike: 0
 			}));
 
 			const end = filtered.map((d) => ({
 				...d,
 				x: d.tx,
-				y: d.ty - (d.action === "exit" ? 17 * dpr : 0),
-				a: d.action === "exit" ? 0 : 1
+				y: d.ty,
+				a: d.state === "remove" ? 0 : 1,
+				strike: 1
 			}));
 
 			const tween = tweened(start, {
-				duration: 500,
-				delay: i * 500,
+				duration: 1000,
+				delay: i * 1000,
 				easing: cubicInOut
 			});
-			tween.set(end).then(() => stepEnd(action));
+			tween.set(end).then(() => stepEnd(state));
 			return tween;
 		});
 
@@ -117,10 +141,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
+		pointer-events: none;
 		/* display: none; */
-	}
-
-	span {
-		position: absolute;
 	}
 </style>

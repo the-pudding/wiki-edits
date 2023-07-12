@@ -2,7 +2,7 @@
 	import { browser } from "$app/environment";
 	import { onMount, getContext } from "svelte";
 	import viewport from "$stores/viewport.js";
-	import { scrollIndex } from "$stores/misc.js";
+	import { scrollIndex, positions } from "$stores/misc.js";
 	import WIP from "$components/helpers/WIP.svelte";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import Figure from "$components/figure/Figure.svelte";
@@ -14,13 +14,14 @@
 	// const data = getContext("data");
 	let height;
 	let data = [];
+	let scrollValue;
 
 	async function load() {
 		data = await loadDiffData();
 	}
 
-	$: diff = data[$scrollIndex || 0]?.diff;
-
+	$: $scrollIndex = scrollValue || 0;
+	$: diff = data[$scrollIndex]?.diff;
 	onMount(() => {
 		height = `${$viewport.height}px`;
 		load();
@@ -31,7 +32,7 @@
 
 {#if data.length}
 	<section id="steps">
-		<Scrolly bind:value={$scrollIndex}>
+		<Scrolly bind:value={scrollValue}>
 			{#each data as { dateFormatted, diffs, revid }, i}
 				{@const active = $scrollIndex === i}
 				<div data-revid={revid} class:active>
@@ -88,6 +89,6 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		padding: 16px 32px;
+		padding: 16px;
 	}
 </style>
