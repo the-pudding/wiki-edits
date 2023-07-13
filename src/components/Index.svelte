@@ -2,7 +2,7 @@
 	import { browser } from "$app/environment";
 	import { onMount, getContext } from "svelte";
 	import viewport from "$stores/viewport.js";
-	import { scrollIndex, positions } from "$stores/misc.js";
+	import { scrollIndex, fontSize, positions } from "$stores/misc.js";
 	import WIP from "$components/helpers/WIP.svelte";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import Figure from "$components/figure/Figure.svelte";
@@ -24,6 +24,10 @@
 	$: diff = data[$scrollIndex]?.diff;
 	onMount(() => {
 		height = `${$viewport.height}px`;
+
+		const heightFactor = height > 800 ? Math.min(1.25, height / 600) : 1;
+		const fs = $viewport.width * 0.015 * heightFactor;
+		$fontSize = fs;
 		load();
 	});
 </script>

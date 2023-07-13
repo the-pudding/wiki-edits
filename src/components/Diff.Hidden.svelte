@@ -4,41 +4,6 @@
 
 	export let diff = [];
 
-	function indexWords() {
-		// TODO not using id anymore
-		// TODO: diffing is not correct (look at "launched" in March)
-		const words = diff
-			.map(({ text, state }) => {
-				if (state === "remove") return;
-				// const clean = text.replace(
-				// 	"<span class='newline'></span>",
-				// 	"[newline]"
-				// );
-				const split = text
-					.split(/(\W(?<!-))/)
-					.filter(Boolean)
-					.map((word) => ({ word, state }));
-				return split;
-			})
-			.flat()
-			.filter((d) => d?.word);
-
-		// a unique id that is a combo of the word and its occurence number
-		const dict = new Map();
-		const withId = words.map(({ word, state }) => {
-			const count = dict.get(word) || 0;
-			dict.set(word, count + 1);
-			const id = `${word}-${count}`;
-			return {
-				word,
-				state,
-				id
-			};
-		});
-
-		return withId;
-	}
-
 	function jump() {
 		const unchange = textNoSpaces
 			.filter((d) => d.state !== "remove")
@@ -50,6 +15,18 @@
 			}));
 
 		$positions = [...unchange];
+	}
+
+	function findBestMatch(d) {
+		const available = $positions.filter(
+			(p) => p.state !== "remove" && !p.matched
+		);
+
+		const sameGroup = available.filter((p) => p.group === d.group);
+
+		if (sameGroup.length) return sameGroup.find((p) => p.text === d.text);
+
+		return available.find((p) => p.text === d.text);
 	}
 
 	function join() {
@@ -66,9 +43,7 @@
 		const unchange = textNoSpaces
 			.filter((d) => d.state === "unchange")
 			.map((d) => {
-				const match = $positions
-					.filter((d) => d.state !== "remove")
-					.find((p) => !p.matched && p.text === d.text);
+				const match = findBestMatch(d);
 				if (match) {
 					match.matched = true;
 					// this will retain the previous x/y position
@@ -86,7 +61,7 @@
 			.filter((d) => d.state === "remove")
 			.map((d) => {
 				const match = $positions
-					.filter((d) => d.state !== "remove")
+					.filter((p) => p.state !== "remove")
 					.find((p) => !p.matched && p.text === d.text);
 				if (match) {
 					match.matched = true;
@@ -159,7 +134,7 @@
 			<span class="newline" />
 		{:else}
 			<span
-				style:font-size={$fontSize}
+				style:font-size="{$fontSize}px"
 				class:add
 				class:remove
 				class:unchange

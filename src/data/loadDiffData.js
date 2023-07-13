@@ -30,7 +30,7 @@ function getDiff(prev = "", cur = "") {
 }
 
 export default async function loadDiffData() {
-	const raw = await csv("assets/test-edits-by-date.csv");
+	const raw = await csv("assets/edits-by-date.csv");
 	const cleanContent = raw.map((d) => ({
 		...d,
 		content: d.content
