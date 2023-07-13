@@ -1,4 +1,5 @@
 <script>
+	import { sum } from "d3";
 	import { browser } from "$app/environment";
 	import { get } from "svelte/store";
 	import { positions, fontSize } from "$stores/misc.js";
@@ -85,9 +86,12 @@
 
 		animating = false;
 		steps = ["remove", "unchange", "add"];
-
+		const durations = [];
 		tweens = steps.map((state, i) => {
 			const filtered = $positions.filter((d) => d.state === state);
+			const delay = sum(durations) || 0;
+			durations.push(filtered.length ? duration : 0);
+
 			const start = filtered.map((d) => ({
 				...d,
 				x: d.x,
@@ -105,8 +109,8 @@
 			}));
 
 			const tween = tweened(start, {
-				duration: duration,
-				delay: i * duration,
+				duration,
+				delay,
 				easing: cubicInOut
 			});
 			tween.set(end).then(() => stepEnd(state));

@@ -1,11 +1,8 @@
 <script>
 	import { afterUpdate } from "svelte";
-	import { positions, fontSize } from "$stores/misc.js";
-	import previous from "$stores/previous.js";
+	import { positions, fontSize, isForward } from "$stores/misc.js";
 
 	export let diff = [];
-
-	const positionsPrev = previous(positions);
 
 	function indexWords() {
 		// TODO not using id anymore
@@ -42,23 +39,18 @@
 		return withId;
 	}
 
-	function setSpanPositions() {
-		// console.table(textNoSpaces);
-		const spans = document.querySelectorAll("span[data-text]");
-		const spansNoSpaces = Array.from(spans).filter(
-			(span) => span.innerHTML !== " "
-		);
+	function jump() {
+		const unchange = textNoSpaces.map((d) => ({
+			...d,
+			x: d.tx,
+			y: d.ty,
+			state: "unchange"
+		}));
 
-		spansNoSpaces.forEach((span, i) => {
-			const { top, left } = span.getBoundingClientRect();
-			const index = +span.dataset.index;
-			const match = textNoSpaces.find((d) => d.index === index);
-			match.tx = left;
-			match.ty = top;
-		});
+		$positions = [...unchange];
+	}
 
-		// console.table(textNoSpaces);
-
+	function join() {
 		// go through ALL textNoSpaces, and find if there are matches for UNCHANGE or REMOVE in $positions (previous)
 		const unchange = textNoSpaces
 			.filter((d) => d.state === "unchange")
@@ -115,8 +107,28 @@
 
 		$positions = [...modified];
 	}
+	function setSpanPositions() {
+		// console.table(textNoSpaces);
+		const spans = document.querySelectorAll("span[data-index]");
+		const spansNoSpaces = Array.from(spans).filter(
+			(span) => span.innerHTML !== " "
+		);
+
+		// add new target position to all textNoSpaces (target text)
+		spansNoSpaces.forEach((span, i) => {
+			const { top, left } = span.getBoundingClientRect();
+			const index = +span.dataset.index;
+			const match = textNoSpaces.find((d) => d.index === index);
+			match.tx = left;
+			match.ty = top;
+		});
+
+		if ($isForward) join();
+		else jump();
+	}
 
 	$: render = diff.filter((d) => d.state !== "remove");
+	$: console.log({ forward: $isForward });
 
 	$: textNoSpaces = diff
 		.filter((d) => d.text !== " " && d.text !== "NEWLINE")
@@ -149,7 +161,7 @@
 <style>
 	.hidden {
 		width: 100%;
-		/* visibility: hidden; */
+		visibility: hidden;
 		pointer-events: none;
 	}
 
