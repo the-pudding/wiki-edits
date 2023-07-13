@@ -40,17 +40,28 @@
 	}
 
 	function jump() {
-		const unchange = textNoSpaces.map((d) => ({
-			...d,
-			x: d.tx,
-			y: d.ty,
-			state: "unchange"
-		}));
+		const unchange = textNoSpaces
+			.filter((d) => d.state !== "remove")
+			.map((d) => ({
+				...d,
+				x: d.tx,
+				y: d.ty,
+				state: "jump"
+			}));
 
 		$positions = [...unchange];
 	}
 
 	function join() {
+		// console.table($positions);
+
+		// make sure all values are at end state
+		$positions = $positions.map((d) => ({
+			...d,
+			x: d.tx,
+			y: d.ty
+		}));
+
 		// go through ALL textNoSpaces, and find if there are matches for UNCHANGE or REMOVE in $positions (previous)
 		const unchange = textNoSpaces
 			.filter((d) => d.state === "unchange")
@@ -128,7 +139,7 @@
 	}
 
 	$: render = diff.filter((d) => d.state !== "remove");
-	$: console.log({ forward: $isForward });
+	// $: console.log({ forward: $isForward });
 
 	$: textNoSpaces = diff
 		.filter((d) => d.text !== " " && d.text !== "NEWLINE")

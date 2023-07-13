@@ -6,7 +6,7 @@
 	import { tweened } from "svelte/motion";
 	import { cubicInOut } from "svelte/easing";
 
-	const duration = 1000;
+	const DEFAULT_DURATION = 1000;
 
 	let canvasEl;
 	let canvasWidth;
@@ -85,11 +85,12 @@
 		if (!ctx) return;
 
 		animating = false;
-		steps = ["remove", "unchange", "add"];
+		steps = ["jump", "remove", "unchange", "add"];
 		const durations = [];
 		tweens = steps.map((state, i) => {
 			const filtered = $positions.filter((d) => d.state === state);
 			const delay = sum(durations) || 0;
+			const duration = state === "jump" ? 0 : DEFAULT_DURATION;
 			durations.push(filtered.length ? duration : 0);
 
 			const start = filtered.map((d) => ({
