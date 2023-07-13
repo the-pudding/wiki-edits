@@ -1,6 +1,6 @@
 <script>
 	import { afterUpdate } from "svelte";
-	import { positions } from "$stores/misc.js";
+	import { positions, fontSize } from "$stores/misc.js";
 	import previous from "$stores/previous.js";
 
 	export let diff = [];
@@ -43,6 +43,7 @@
 	}
 
 	function setSpanPositions() {
+		// console.table(textNoSpaces);
 		const spans = document.querySelectorAll("span[data-text]");
 		const spansNoSpaces = Array.from(spans).filter(
 			(span) => span.innerHTML !== " "
@@ -54,12 +55,6 @@
 			const match = textNoSpaces.find((d) => d.index === index);
 			match.tx = left;
 			match.ty = top;
-			// const id = span.dataset.id;
-			// const text = span.innerHTML;
-			// const tx = left;
-			// const ty = top;
-			// const state = span.dataset.state;
-			// return { id, tx, ty, text, state };
 		});
 
 		// console.table(textNoSpaces);
@@ -68,7 +63,9 @@
 		const unchange = textNoSpaces
 			.filter((d) => d.state === "unchange")
 			.map((d) => {
-				const match = $positions.find((p) => !p.matched && p.text === d.text);
+				const match = $positions
+					.filter((d) => d.state !== "remove")
+					.find((p) => !p.matched && p.text === d.text);
 				if (match) {
 					match.matched = true;
 					// this will retain the previous x/y position
@@ -113,6 +110,7 @@
 		// console.table(add);
 
 		const modified = [...unchange, ...remove, ...add];
+		// console.table($positions);
 		modified.forEach((m) => delete m.matched);
 
 		$positions = [...modified];
@@ -138,12 +136,11 @@
 			<span class="newline" />
 		{:else}
 			<span
+				style:font-size={$fontSize}
 				class:add
 				class:remove
 				class:unchange
-				data-index={index}
-				data-text={text}
-				data-state={state}>{@html text}</span
+				data-index={index}>{@html text}</span
 			>
 		{/if}
 	{/each}
@@ -153,7 +150,7 @@
 	.hidden {
 		width: 100%;
 		/* visibility: hidden; */
-		/* pointer-events: none; */
+		pointer-events: none;
 	}
 
 	.newline {
@@ -163,7 +160,7 @@
 
 	[data-text] {
 		color: gray;
-		font-size: 18px;
+		white-space: nowrap;
 	}
 
 	.add {
