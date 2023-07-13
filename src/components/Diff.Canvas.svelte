@@ -5,6 +5,8 @@
 	import { tweened } from "svelte/motion";
 	import { cubicInOut } from "svelte/easing";
 
+	const fontSize = 18;
+
 	let canvasEl;
 	let canvasWidth;
 	let canvasHeight;
@@ -24,17 +26,17 @@
 
 		ctx.clearRect(0, 0, width, height);
 
-		ctx.font = `${16 * dpr}px sans-serif`;
+		ctx.font = `${fontSize * dpr}px sans-serif`;
 		// console.log("render");
 		tweens.forEach((t) => {
 			const items = get(t);
 			items.forEach((item) => {
-				const { id, x, y, a, state, text, strike } = item;
-				const match = $positions.find((p) => p.id === id);
+				const { index, x, y, a, state, text, strike } = item;
+				const match = $positions.find((p) => p.index === index);
 				match.x = x;
 				match.y = y;
 				const left = x * dpr;
-				const top = y * dpr + (16 - 1) * dpr;
+				const top = y * dpr + (fontSize - 1) * dpr;
 
 				// ctx.strokeStyle = "#fff"; // Set your stroke color
 				// ctx.lineWidth = 2; // Set your line width for the stroke
@@ -46,16 +48,16 @@
 				// draw a strikethrough if removeing
 				if (item.state === "remove") {
 					if (!item.textW) item.textW = ctx.measureText(text).width;
-					const strikeProgress = Math.min(1, strike * 4);
+					const strikeProgress = Math.min(1, strike * fontSize);
 					const strikeW = strikeProgress * item.textW;
-
+					const offsetY = (fontSize / 4) * dpr;
 					ctx.strokeStyle = getFill({ state, a });
 					ctx.lineWidth = 2;
 					ctx.beginPath();
-					ctx.moveTo(left, top - 4 * dpr);
+					ctx.moveTo(left, top - offsetY);
 
 					// if (strikeProgress === 1) item.strikeDone = true;
-					ctx.lineTo(left + strikeW, top - 4 * dpr);
+					ctx.lineTo(left + strikeW, top - offsetY);
 					ctx.stroke();
 				}
 				const w = ctx.measureText(text).width;
@@ -137,7 +139,7 @@
 <style>
 	canvas {
 		position: absolute;
-		top: 0;
+		top: 200px;
 		left: 0;
 		width: 100%;
 		height: 100%;

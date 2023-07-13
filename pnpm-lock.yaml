@@ -23,6 +23,9 @@ devDependencies:
   d3:
     specifier: ^7.8.5
     version: 7.8.5
+  diff:
+    specifier: ^5.1.0
+    version: 5.1.0
   gsap:
     specifier: ^3.12.2
     version: 3.12.2
@@ -906,6 +909,11 @@ packages:
 
   /devalue@4.3.2:
     resolution: {integrity: sha512-KqFl6pOgOW+Y6wJgu80rHpo2/3H07vr8ntR9rkkFIRETewbf5GaYYcakYfiKz89K+sLsuPkQIZaXDMjUObZwWg==}
+    dev: true
+
+  /diff@5.1.0:
+    resolution: {integrity: sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==}
+    engines: {node: '>=0.3.1'}
     dev: true
 
   /dot-case@3.0.4:
