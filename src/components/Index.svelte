@@ -1,44 +1,39 @@
 <script>
 	import { browser } from "$app/environment";
 	import { onMount, getContext } from "svelte";
-	import viewport from "$stores/viewport.js";
-	import { scrollIndex, fontSize, positions } from "$stores/misc.js";
+
+	import {
+		diffIndex,
+		diffData,
+		numDiffs,
+		fontSize,
+		positions,
+		canvasHeight
+	} from "$stores/misc.js";
 	import WIP from "$components/helpers/WIP.svelte";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
+	import Range from "$components/helpers/Range.svelte";
 	import Figure from "$components/figure/Figure.svelte";
 	import DiffHidden from "$components/Diff.Hidden.svelte";
 	import DiffCanvas from "$components/Diff.Canvas.svelte";
-	import loadDiffData from "$data/loadDiffData.js";
 
 	// const copy = getContext("copy");
 	// const data = getContext("data");
-	let height;
-	let data = [];
-	let scrollValue;
+	let diffValue;
 
-	async function load() {
-		data = await loadDiffData();
-	}
-
-	$: $scrollIndex = scrollValue || 0;
-	$: diff = data[$scrollIndex]?.diff;
-	onMount(() => {
-		height = `${$viewport.height}px`;
-
-		const heightFactor = height > 800 ? Math.min(1.25, height / 600) : 1;
-		const fs = $viewport.width * 0.015 * heightFactor;
-		$fontSize = fs;
-		load();
-	});
+	$: $diffIndex = diffValue || 0;
 </script>
 
 <!-- <WIP /> -->
 
-{#if data.length}
+{#if $diffData.length}
+	<section id="slider">
+		<Range bind:value={diffValue} min={0} max={$numDiffs} />
+	</section>
 	<section id="steps">
-		<Scrolly bind:value={scrollValue}>
+		<!-- <Scrolly bind:value={diffValue}>
 			{#each data as { dateFormatted, diffs, revid }, i}
-				{@const active = $scrollIndex === i}
+				{@const active = $diffIndex === i}
 				<div data-revid={revid} class:active>
 					<p>
 						{dateFormatted}
@@ -50,11 +45,11 @@
 					</p>
 				</div>
 			{/each}
-		</Scrolly>
+		</Scrolly> -->
 	</section>
 
-	<section id="graphic" style:height>
-		<DiffHidden {diff} />
+	<section id="graphic" style:height={$canvasHeight}>
+		<DiffHidden />
 		<DiffCanvas />
 	</section>
 {/if}
@@ -68,6 +63,10 @@
 		position: relative;
 		z-index: var(--z-overlay);
 		pointer-events: none;
+	}
+
+	#slider {
+		padding: 32px;
 	}
 
 	[data-revid] {
@@ -94,5 +93,6 @@
 		left: 0;
 		width: 100%;
 		padding: 16px;
+		pointer-events: none;
 	}
 </style>

@@ -23,6 +23,7 @@
 		return `rgba(0, 0, 0, ${a})`;
 	}
 	function render() {
+		console.log("render");
 		if (!animating) return;
 
 		ctx.clearRect(0, 0, width, height);
@@ -77,6 +78,7 @@
 	}
 
 	function stepEnd(state) {
+		console.log(state);
 		steps.unshift();
 		if (steps.length === 0) animating = false;
 	}

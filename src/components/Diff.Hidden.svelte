@@ -1,8 +1,13 @@
 <script>
 	import { afterUpdate } from "svelte";
-	import { positions, fontSize, isForward } from "$stores/misc.js";
-
-	export let diff = [];
+	import {
+		positions,
+		fontSize,
+		isForward,
+		isJump,
+		diffIndex,
+		diffData
+	} from "$stores/misc.js";
 
 	function jump() {
 		const unchange = textNoSpaces
@@ -24,7 +29,10 @@
 
 		const sameGroup = available.filter((p) => p.group === d.group);
 
-		if (sameGroup.length) return sameGroup.find((p) => p.text === d.text);
+		if (sameGroup.length) {
+			const match = sameGroup.find((p) => p.text === d.text);
+			if (match) return match;
+		}
 
 		return available.find((p) => p.text === d.text);
 	}
@@ -93,6 +101,7 @@
 
 		$positions = [...modified];
 	}
+
 	function setSpanPositions() {
 		// console.table(textNoSpaces);
 		const spans = document.querySelectorAll("span[data-index]");
@@ -109,14 +118,17 @@
 			match.ty = top;
 		});
 
-		if ($isForward) join();
+		if ($isForward && !$isJump) join();
 		else jump();
 	}
 
-	$: render = diff.filter((d) => d.state !== "remove");
-	// $: console.log({ forward: $isForward });
+	// $: console.log("diff", $diffIndex);
+	// $: console.log("forw", $isForward);
+	// $: console.log("jump", $isJump);
 
-	$: textNoSpaces = diff
+	$: render = $diffData.filter((d) => d.state !== "remove");
+
+	$: textNoSpaces = $diffData
 		.filter((d) => d.text !== " " && d.text !== "NEWLINE")
 		.map((d) => ({ ...d }));
 
@@ -148,7 +160,7 @@
 	.hidden {
 		width: 100%;
 		visibility: hidden;
-		pointer-events: none;
+		/* pointer-events: none; */
 	}
 
 	.newline {
@@ -156,7 +168,7 @@
 		height: 16px;
 	}
 
-	[data-text] {
+	[data-index] {
 		color: gray;
 		white-space: nowrap;
 	}
