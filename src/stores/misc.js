@@ -1,4 +1,4 @@
-import { get, readable, writable, derived } from "svelte/store";
+import { get, writable, derived } from "svelte/store";
 import { browser } from "$app/environment";
 import previous from "$stores/previous.js";
 import viewport from "$stores/viewport.js";
@@ -26,6 +26,10 @@ export const diffData = derived([data, diffIndex], ([$data, $diffIndex]) => {
 	return $data[$diffIndex]?.diff || [];
 });
 
+export const stepData = derived([data, diffIndex], ([$data, $diffIndex]) => {
+	return $data;
+});
+
 export const numDiffs = derived(data, ($data) => $data.length - 1);
 
 async function load() {
@@ -34,7 +38,7 @@ async function load() {
 
 	const { width, height } = get(viewport);
 
-	const heightFactor = height > 800 ? Math.min(1.25, height / 600) : 1;
+	const heightFactor = height > 800 ? Math.min(1.1, height / 600) : 1;
 	const fs = Math.floor(width * 0.015 * heightFactor);
 
 	canvasHeight.set(`${height}px`);

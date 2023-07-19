@@ -4,7 +4,7 @@
 
 	import {
 		diffIndex,
-		diffData,
+		stepData,
 		numDiffs,
 		fontSize,
 		positions,
@@ -26,13 +26,13 @@
 
 <!-- <WIP /> -->
 
-{#if $diffData.length}
-	<section id="slider">
+{#if $stepData.length}
+	<!-- <section id="slider">
 		<Range bind:value={diffValue} min={0} max={$numDiffs} />
-	</section>
+	</section> -->
 	<section id="steps">
-		<!-- <Scrolly bind:value={diffValue}>
-			{#each data as { dateFormatted, diffs, revid }, i}
+		<Scrolly bind:value={diffValue}>
+			{#each $stepData as { dateFormatted, diffs, revid }, i}
 				{@const active = $diffIndex === i}
 				<div data-revid={revid} class:active>
 					<p>
@@ -45,7 +45,7 @@
 					</p>
 				</div>
 			{/each}
-		</Scrolly> -->
+		</Scrolly>
 	</section>
 
 	<section id="graphic" style:height={$canvasHeight}>
@@ -70,10 +70,10 @@
 	}
 
 	[data-revid] {
-		height: 50vh;
+		height: 25vh;
 		display: flex;
 		align-items: center;
-		justify-content: flex-end;
+		justify-content: flex-start;
 	}
 
 	p {
@@ -93,6 +93,7 @@
 		left: 0;
 		width: 100%;
 		padding: 16px;
+		padding-left: 128px;
 		pointer-events: none;
 	}
 </style>

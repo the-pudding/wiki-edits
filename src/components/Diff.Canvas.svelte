@@ -23,7 +23,7 @@
 		return `rgba(0, 0, 0, ${a})`;
 	}
 	function render() {
-		console.log("render");
+		// console.log("render");
 		if (!animating) return;
 
 		ctx.clearRect(0, 0, width, height);
@@ -78,8 +78,7 @@
 	}
 
 	function stepEnd(state) {
-		console.log(state);
-		steps.unshift();
+		steps.shift();
 		if (steps.length === 0) animating = false;
 	}
 
@@ -88,6 +87,9 @@
 
 		animating = false;
 		steps = ["jump", "remove", "unchange", "add"];
+		// const activeSteps = [...new Set($positions.map((d) => d.state))];
+		// steps = allSteps.filter((d) => activeSteps.includes(d));
+		// console.log(steps);
 		const durations = [];
 		tweens = steps.map((state, i) => {
 			const filtered = $positions.filter((d) => d.state === state);
